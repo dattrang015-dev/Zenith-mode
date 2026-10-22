@@ -126,4 +126,4 @@ Nếu bạn muốn mở rộng dự án, có thể:
 
 ---
 
-Made for Zenith VN by the Zenith Mode project.
+Made for Zenith VN by udVietNamspeedrace.
