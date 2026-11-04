@@ -15,7 +15,7 @@ from trl import SFTTrainer
 # =====================================================================
 # BƯỚC 2: CẤU HÌNH THÔNG TIN TÀI KHOẢN (BẢO MẬT NỘI BỘ)
 # =====================================================================
-HF_TOKEN = "hf key của bạn"
+HF_TOKEN = "hf của bạn"
 os.environ["HF_TOKEN"] = HF_TOKEN
 
 # =====================================================================
@@ -154,5 +154,32 @@ trainer = SFTTrainer(
 trainer.train()
 
 print("\n🥳 Huấn luyện thành công vẹn toàn!")
-trainer.save_model("./results_qwen_local")
-print("🎉 Bộ não AI tiếng Việt đã được đóng gói tại thư mục 'results_qwen_local'!")
+
+# =====================================================================
+# BƯỚC 7: ĐÓNG GÓI, CẬP NHẬT METADATA VÀ LƯU MÔ HÌNH
+# =====================================================================
+import json
+
+output_dir = "./results_qwen_local"
+
+# Lưu model và tokenizer như bình thường
+trainer.save_model(output_dir)
+tokenizer.save_pretrained(output_dir)
+
+# Cập nhật trực tiếp tệp config.json để gắn nhãn định danh tác giả và tên thương hiệu
+config_path = os.path.join(output_dir, "config.json")
+if os.path.exists(config_path):
+    with open(config_path, "r", encoding="utf-8") as f:
+        config_data = json.load(f)
+
+    # Bổ sung thông tin định danh cá nhân và thương hiệu vào metadata của model
+    config_data["architectures"] = ["Qwen2ForCausalLM"]
+    config_data["model_type"] = "qwen2"
+    config_data["_name_or_path"] = "Zenith-VN-0.5B"
+    config_data["author"] = "udVietNamspeedrace"
+
+    with open(config_path, "w", encoding="utf-8") as f:
+        json.dump(config_data, f, indent=2, ensure_ascii=False)
+    print("🏷️ Đã cập nhật thành công metadata định danh vào config.json!")
+
+print(f"\n🎉 [HOÀN TẤT] Bộ não Zenith đã được đóng gói và lưu tại {output_dir}!")
